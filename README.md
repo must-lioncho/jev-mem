@@ -2,6 +2,26 @@
 
 [한국어 안내](README.kr.md)
 
+## Why this exists
+
+Agents redo work that was already done. The fix is to bring back the earlier session's
+notes, but bringing them back is where the cost hides:
+
+- **Too many tokens.** In the author's setup, claude-mem loaded about 30K tokens of past
+  context every time a session opened.
+- **Context window gone before you start.** On a 200K-context model that is 15-30% of the
+  window used before the first prompt. A 1M window softens this, but the same load repeats
+  in every session.
+- **Fast but not accurate.** claude-mem finds records without AI (vector match only). That
+  is fast, but it cannot tell a related record from one that shares a few words, so most
+  of those tokens go to records the task does not need. This was the biggest problem.
+- **Settings are not enough.** claude-mem can lower the limits, but a fixed number cannot
+  decide which record matters for this prompt.
+
+jev-mem keeps the fast search as a first pass and lets JEV, an AI judge, decide which record
+is actually relevant. One good record goes in; when none fit, nothing goes in. It works the
+same way in Claude Code, Codex, and Antigravity.
+
 Inject only the [claude-mem](https://github.com/thedotmack/claude-mem) records that
 [JEV](https://docs.typesafe.ai) judges relevant to the prompt you just typed.
 
