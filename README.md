@@ -46,6 +46,31 @@ Measured on one machine (2026-10-18, claude-mem 14.0.1): about 0.5 s per prompt.
 Three prompts are an example, not a benchmark. JEV judges relevance, not truth: an
 outdated record on the right topic can still be selected.
 
+## Measuring AI-era work
+
+AI-era work has two metrics:
+
+1. **Lead time**: the time from signal to production.
+2. **Human intervention**: how many prompts a person actually typed to get there.
+
+jev-mem already reads every session to choose memory records, so it is also the right place to collect these statistics.
+
+`jev-mem human-count` counts the prompts a person typed in every session related to a topic. It covers Claude, Codex and Antigravity.
+
+- Coverage: it includes prompts queued while a turn was still running.
+- Exclusions: it ignores hook text, system reminders and tool results.
+- Relevance: a keyword filter picks candidate sessions. JEV then decides, session by session, whether each one belongs to the topic.
+- Privacy: prompt text is not printed unless you pass `--show`.
+
+```sh
+jev-mem human-count --topic "<project>" --since 2026-10-18T00:00:00+05:30 \
+  --keywords "<alias>,<alias>" --json --out human-interventions.json
+```
+
+Run it on demand, for example from a dashboard's refresh button. Do not run it on a timer.
+
+Lead-time measurement is not built yet.
+
 ## Runtimes
 
 Not only Claude. The same core runs behind a small adapter per runtime, so you keep using

@@ -1,9 +1,10 @@
 #!/usr/bin/env node
-import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { CONFIG_PATH, loadConfig, workerUrl } from "../src/config.mjs";
 import { apiKey } from "../src/jev.mjs";
+import { formatReport, humanCount } from "../src/human-count.mjs";
 import { LOG_PATH, selectContext } from "../src/run.mjs";
 
 const MEM_SETTINGS = join(homedir(), ".claude-mem", "settings.json");
@@ -20,6 +21,9 @@ const USAGE = `jev-mem — JEV picks which claude-mem records reach the prompt
   jev-mem doctor                                check worker, JEV key, claude-mem settings
   jev-mem setup [--apply]                       show (or apply, with backup) claude-mem settings changes
   jev-mem config                                print effective settings
+  jev-mem human-count --topic "<text>" [--since ISO] [--until ISO] [--runtime claude|codex|agy|all]
+                      [--keywords a,b] [--min-probability 0.7] [--no-jev] [--show] [--json] [--out FILE]
+                                                count prompts a human typed in all sessions related to a topic
 
 Settings: ${CONFIG_PATH}
 Decision log: ${LOG_PATH}`;
@@ -77,9 +81,52 @@ async function tryPrompt(args) {
   console.log(context ? `\n${context}` : "\n(nothing injected)");
 }
 
+function flags(args) {
+  const out = { _: [] };
+  const valued = new Set(["topic", "since", "until", "runtime", "keywords", "min-probability", "out"]);
+  for (let i = 0; i < args.length; i++) {
+    const m = /^--([\w-]+)(?:=(.*))?$/.exec(args[i]);
+    if (!m) out._.push(args[i]);
+    else if (m[2] !== undefined) out[m[1]] = m[2];
+    else if (valued.has(m[1])) out[m[1]] = args[++i];
+    else out[m[1]] = true;
+  }
+  return out;
+}
+
+async function humanCountCmd(args) {
+  const f = flags(args);
+  const topic = f.topic ?? f._.join(" ");
+  if (!topic) return console.error('human-count needs --topic "<text>"');
+  const runtime = f.runtime ?? "all";
+  if (!["claude", "codex", "agy", "all"].includes(runtime)) return console.error("--runtime must be claude, codex, agy, or all");
+  const config = loadConfig();
+  const report = await humanCount({
+    topic,
+    since: f.since,
+    until: f.until,
+    runtimes: runtime === "all" ? ["claude", "codex", "agy"] : [runtime],
+    extraKeywords: f.keywords ? f.keywords.split(",").map((s) => s.trim()).filter(Boolean) : [],
+    minProbability: f["min-probability"] !== undefined ? Number(f["min-probability"]) : config.minProbability,
+    key: apiKey(),
+    useJev: !f["no-jev"],
+    show: Boolean(f.show),
+  });
+  if (f.out) {
+    mkdirSync(dirname(f.out), { recursive: true });
+    writeFileSync(f.out, `${JSON.stringify(report, null, 2)}\n`);
+  }
+  if (f.json) console.log(JSON.stringify(report, null, 2));
+  else {
+    console.log(formatReport(report));
+    if (f.out) console.log(`\nwritten: ${f.out}`);
+  }
+}
+
 const [cmd, ...rest] = process.argv.slice(2);
 if (cmd === "try") await tryPrompt(rest);
 else if (cmd === "doctor") await doctor();
 else if (cmd === "setup") setup(rest.includes("--apply"));
+else if (cmd === "human-count") await humanCountCmd(rest);
 else if (cmd === "config") console.log(JSON.stringify(loadConfig(), null, 2));
 else console.log(USAGE);
