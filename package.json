@@ -1,0 +1,11 @@
+{
+  "name": "jev-mem",
+  "version": "0.1.0",
+  "description": "JEV picks which memory records reach the prompt, across agent runtimes",
+  "type": "module",
+  "bin": { "jev-mem": "bin/jev-mem.mjs" },
+  "scripts": { "test": "node --test \"test/**/*.test.mjs\"" },
+  "engines": { "node": ">=20.12" },
+  "license": "MIT",
+  "keywords": ["claude-mem", "jev", "jev-router", "claude-code", "memory"]
+}

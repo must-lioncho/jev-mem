@@ -1,0 +1,11 @@
+{
+  "name": "jev-mem",
+  "owner": { "name": "must-lioncho" },
+  "plugins": [
+    {
+      "name": "jev-mem",
+      "source": "./",
+      "description": "JEV picks which claude-mem records reach each prompt"
+    }
+  ]
+}
