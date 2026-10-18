@@ -35,6 +35,19 @@ claude-mem 벡터 검색을 1차로 쓰고, JEV를 최종 판단자로 붙인다
 세 프롬프트는 예시이고 벤치마크가 아니다. JEV는 관련성을 판단하고 사실 여부는 판단하지 않는다.
 주제는 맞지만 낡은 기록이 뽑힐 수 있다.
 
+## 지원 런타임
+
+Claude만이 아니다. 같은 코어를 런타임별 작은 어댑터가 감싼다. 평소 쓰던 CLI를 그대로 쓰면 훅이 알아서 돈다.
+
+| 런타임 | 훅 파일 | 이벤트 | 명령 |
+| --- | --- | --- | --- |
+| Claude Code (`glm-claude` 포함) | `~/.claude/settings.json` | `UserPromptSubmit` | `node <repo>/scripts/hook.mjs --runtime claude` |
+| Codex CLI | `~/.codex/hooks.json` | `UserPromptSubmit` | `node <repo>/scripts/hook.mjs --runtime codex` |
+| Antigravity CLI (`agy`) | `~/.gemini/config/hooks.json` | `PreInvocation` | `node <repo>/scripts/hook.mjs --runtime agy` |
+
+턴마다 한 줄이 보인다. 예: `[jev-mem] Found 5 notes. Added the best 1 (#374, 81% match) (0.6s).`
+jev-router와 함께 쓰면 `[Jev] routed ...` 줄 바로 다음에 나온다.
+
 ## 설치 순서
 
 [jev-router](https://github.com/must-lioncho/jev-router-effort)를 먼저 설치하고 이 플러그인을 설치한다.

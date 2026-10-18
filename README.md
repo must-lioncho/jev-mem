@@ -46,9 +46,25 @@ Measured on one machine (2026-10-18, claude-mem 14.0.1): about 0.5 s per prompt.
 Three prompts are an example, not a benchmark. JEV judges relevance, not truth: an
 outdated record on the right topic can still be selected.
 
+## Runtimes
+
+Not only Claude. The same core runs behind a small adapter per runtime, so you keep using
+the CLI you already use and the hook runs on its own.
+
+| Runtime | Hook file | Hook event | Command |
+| --- | --- | --- | --- |
+| Claude Code (and GLM via `glm-claude`) | `~/.claude/settings.json` | `UserPromptSubmit` | `node <repo>/scripts/hook.mjs --runtime claude` |
+| Codex CLI | `~/.codex/hooks.json` | `UserPromptSubmit` | `node <repo>/scripts/hook.mjs --runtime codex` |
+| Antigravity CLI (`agy`) | `~/.gemini/config/hooks.json` | `PreInvocation` | `node <repo>/scripts/hook.mjs --runtime agy` |
+
+Each turn shows one line, for example
+`[jev-mem] Found 5 notes. Added the best 1 (#374, 81% match) (0.6s).`
+With jev-router it appears right after the `[Jev] routed ...` line.
+
 ## Requirements
 
-- Claude Code with the claude-mem plugin installed and its worker running
+- Claude Code, Codex CLI, or Antigravity CLI
+- claude-mem installed with its worker running (the memory store)
 - Node.js 20.12+
 - A JEV key from [TypeSafe](https://docs.typesafe.ai)
 
