@@ -1,12 +1,21 @@
 // One visible line per turn, like jev-router's "[Jev] routed this turn ..." notice.
+// Plain words on purpose: the reader should get it at a glance.
+const SKIP_REASONS = {
+  "short-prompt": "message too short",
+  disabled: "turned off",
+  "no-jev-key": "no JEV key",
+  "no-candidates": "no notes yet",
+};
+
 export function statusLine(decision) {
   const tag = "[jev-mem]";
-  if (decision.error) return `${tag} 관련 기록 검색 실패, 아무것도 불러오지 않음 (${decision.error}).`;
-  if (decision.skipped) return `${tag} 검색 건너뜀 (${decision.skipped}).`;
+  const secs = `${((decision.ms ?? 0) / 1000).toFixed(1)}s`;
+  if (decision.error) return `${tag} Memory search failed, so no notes added (${decision.error}).`;
+  if (decision.skipped) return `${tag} Skipped memory: ${SKIP_REASONS[decision.skipped] ?? decision.skipped}.`;
   const found = decision.candidates.length;
   const picked = decision.candidates.filter((c) => decision.injected.includes(c.id));
-  if (!found) return `${tag} 관련 기록을 찾았지만 없었습니다 (${decision.ms} ms).`;
-  if (!picked.length) return `${tag} 관련 기록 ${found}개 찾음, 따로 불러올 것은 없었습니다 (${decision.ms} ms).`;
-  const best = picked.map((c) => `#${c.id} p=${c.p?.toFixed(2)}`).join(", ");
-  return `${tag} 관련 기록 ${found}개 중 가장 높은 ${picked.length}개를 불러옵니다 (${best}, ${decision.ms} ms).`;
+  if (!found) return `${tag} No related notes found (${secs}).`;
+  if (!picked.length) return `${tag} Found ${found} notes. None fit well, so none added (${secs}).`;
+  const best = picked.map((c) => `#${c.id}, ${Math.round((c.p ?? 0) * 100)}% match`).join("; ");
+  return `${tag} Found ${found} notes. Added the best ${picked.length} (${best}) (${secs}).`;
 }

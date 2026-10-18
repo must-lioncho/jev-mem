@@ -20,7 +20,7 @@ try {
     const config = loadConfig();
     const { context, decision } = await selectContext({ prompt, cwd: cwd || process.cwd(), config });
     logDecision({ decision, prompt, config });
-    process.stdout.write(adapter.write({ context, status: statusLine(decision) }));
+    process.stdout.write(adapter.write({ prompt, context, status: statusLine(decision) }));
   }
 } catch {
   // Never block or alter the user's prompt.

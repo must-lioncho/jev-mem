@@ -1,5 +1,6 @@
+import { agy } from "./agy.mjs";
 import { claude } from "./claude.mjs";
+import { codex } from "./codex.mjs";
 
 // One adapter per runtime: parse its hook stdin, format its hook stdout.
-// Codex and Gemini get added here once their prompt-time hook contracts are verified.
-export const ADAPTERS = { claude };
+export const ADAPTERS = { claude, codex, agy };
