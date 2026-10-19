@@ -2,6 +2,12 @@
 
 [한국어 안내](README.kr.md)
 
+![Work in A, ask in B: 227 chars down to 15](docs/images/use-case-cross-project.png)
+
+![Start session: claude-mem 30k-50k tokens vs jev-mem ~2k](docs/images/use-case-token-cost.png)
+
+![One memory, three tools: Claude, Codex, Antigravity](docs/images/use-case-three-runtimes.png)
+
 ## Why this exists
 
 Agents redo work that was already done. The fix is to bring back the earlier session's

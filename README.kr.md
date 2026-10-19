@@ -2,6 +2,12 @@
 
 [English](README.md)
 
+![Work in A, ask in B: 227 chars down to 15](docs/images/use-case-cross-project.png)
+
+![Start session: claude-mem 30k-50k tokens vs jev-mem ~2k](docs/images/use-case-token-cost.png)
+
+![One memory, three tools: Claude, Codex, Antigravity](docs/images/use-case-three-runtimes.png)
+
 ## 왜 만들었나
 
 에이전트는 이미 했던 일을 다시 한다. 이전 세션 기록을 불러오면 막을 수 있지만, 불러오는 과정에 비용이 숨어 있다.
